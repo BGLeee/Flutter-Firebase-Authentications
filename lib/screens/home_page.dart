@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fire_auths/provider/sign_in_provider.dart';
 import 'package:fire_auths/screens/sign_in_page.dart';
 import 'package:flutter/material.dart';
@@ -32,26 +30,15 @@ class _HomePageState extends State<HomePage> {
           child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.grey,
-            backgroundImage: NetworkImage("${sp.imageUrl}"),
-            radius: 50,
-          ),
-          ElevatedButton(
-              onPressed: () {
-                log("${sp.imageUrl}");
-                log("${sp.name}");
-                log("${sp.uid}");
-                log("${sp.email}");
-              },
-              child: Text("Sign Out")),
           ElevatedButton(
               onPressed: () {
                 sp.signOut();
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => SignInPage()));
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SignInPage()));
               },
-              child: Text("Out")),
+              child: const Text("Sign Out")),
         ],
       )),
     );
