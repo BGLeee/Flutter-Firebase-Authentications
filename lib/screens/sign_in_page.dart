@@ -97,7 +97,7 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 const SizedBox(height: 10),
                 RoundedLoadingButton(
-                  onPressed: () {},
+                  onPressed: handleFacebookSignIn,
                   color: Colors.blue,
                   controller: facebookController,
                   successColor: Colors.blue,
@@ -122,7 +122,7 @@ class _SignInPageState extends State<SignInPage> {
                 RoundedLoadingButton(
                   onPressed: () {},
                   color: Colors.black,
-                  controller: facebookController,
+                  controller: googleController,
                   successColor: Colors.black,
                   width: MediaQuery.of(context).size.width * 10.80,
                   elevation: 0,
@@ -190,6 +190,71 @@ class _SignInPageState extends State<SignInPage> {
                               (value) => sp.setSignIn().then(
                                     (value) => {
                                       googleController.success(),
+                                      Future.delayed(const Duration(seconds: 1),
+                                          () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage(),
+                                          ),
+                                        );
+                                      })
+                                    },
+                                  ),
+                            ),
+                      );
+                }
+                setState(() {});
+              },
+            );
+          }
+        },
+      );
+    }
+  }
+
+  Future handleFacebookSignIn() async {
+    final sp = context.read<SignInProvider>();
+    final ip = context.read<InternetProvider>();
+    await ip.checkInternetConnection();
+    if (ip.isConnected == false) {
+      openSnackbar(context, "Check you Internet Connection", Colors.red);
+      facebookController.reset();
+    } else {
+      await sp.signInWithFacebook().then(
+        (value) {
+          if (sp.hasError == true) {
+            openSnackbar(context, sp.errorCode, Colors.red);
+            facebookController.reset();
+          } else {
+            sp.checkUserExists().then(
+              (value) async {
+                if (value == true) {
+                  sp.getUserDataFromFirestore(sp.uid).then(
+                        (value) => sp.saveDataToSharedPreference().then(
+                              (value) => sp.setSignIn().then(
+                                (value) {
+                                  facebookController.success();
+                                  Future.delayed(const Duration(seconds: 1),
+                                      () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const HomePage(),
+                                      ),
+                                    );
+                                  });
+                                },
+                              ),
+                            ),
+                      );
+                } else {
+                  sp.saveDataToFirestore().then(
+                        (value) => sp.saveDataToSharedPreference().then(
+                              (value) => sp.setSignIn().then(
+                                    (value) => {
+                                      facebookController.success(),
                                       Future.delayed(const Duration(seconds: 1),
                                           () {
                                         Navigator.pushReplacement(

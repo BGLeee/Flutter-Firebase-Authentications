@@ -5,7 +5,7 @@
     <string name="app_name">FireAuth</string>
     <string name="facebook_app_id">683231447071963</string>
     <string name="fb_login_protocol_scheme">fb1234</string>
-    <string name="facebook_client_token">56789</string>
+    <string name="facebook_client_token">ac7c9e8f7231eaff042ee798634f584c</string>
 
 
 </resource>
