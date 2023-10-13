@@ -1,6 +1,13 @@
+import 'dart:developer';
+
+import 'package:fire_auths/provider/internet_provider.dart';
+import 'package:fire_auths/provider/sign_in_provider.dart';
+import 'package:fire_auths/screens/home_page.dart';
+import 'package:fire_auths/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class SignInPage extends StatefulWidget {
@@ -18,6 +25,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final sp = context.read<SignInProvider>();
     return Scaffold(
         body: SafeArea(
       child: Padding(
@@ -31,20 +39,23 @@ class _SignInPageState extends State<SignInPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(
-                    children: [
-                      const Image(
-                        image: AssetImage("assets/firebase.png"),
-                      ),
-                      Positioned(
-                        bottom: -1,
-                        right: 3,
-                        child: SvgPicture.asset(
-                          "assets/lock.svg",
-                          // height: 32,
+                  Hero(
+                    tag: "Logo",
+                    child: Stack(
+                      children: [
+                        const Image(
+                          image: AssetImage("assets/firebase.png"),
                         ),
-                      ),
-                    ],
+                        Positioned(
+                          bottom: -1,
+                          right: 3,
+                          child: SvgPicture.asset(
+                            "assets/lock.svg",
+                            // height: 32,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   const Text(
@@ -66,7 +77,7 @@ class _SignInPageState extends State<SignInPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 RoundedLoadingButton(
-                  onPressed: () {},
+                  onPressed: handleGoogleSignIn,
                   color: Colors.red,
                   controller: googleController,
                   successColor: Colors.red,
@@ -114,7 +125,7 @@ class _SignInPageState extends State<SignInPage> {
                 RoundedLoadingButton(
                   onPressed: () {},
                   color: Colors.black,
-                  controller: googleController,
+                  controller: facebookController,
                   successColor: Colors.black,
                   width: MediaQuery.of(context).size.width * 10.80,
                   elevation: 0,
@@ -139,5 +150,70 @@ class _SignInPageState extends State<SignInPage> {
         ),
       ),
     ));
+  }
+
+  Future handleGoogleSignIn() async {
+    final sp = context.read<SignInProvider>();
+    final ip = context.read<InternetProvider>();
+    await ip.checkInternetConnection();
+    if (ip.isConnected == false) {
+      openSnackbar(context, "Check you Internet Connection", Colors.red);
+      googleController.reset();
+    } else {
+      await sp.signInWithGoogle().then(
+        (value) {
+          if (sp.hasError == true) {
+            openSnackbar(context, sp.errorCode, Colors.red);
+            googleController.reset();
+          } else {
+            sp.checkUserExists().then(
+              (value) async {
+                if (value == true) {
+                  sp.getUserDataFromFirestore(sp.uid).then(
+                        (value) => sp.saveDataToSharedPreference().then(
+                              (value) => sp.setSignIn().then(
+                                (value) {
+                                  googleController.success();
+                                  Future.delayed(const Duration(seconds: 1),
+                                      () {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const HomePage(),
+                                      ),
+                                    );
+                                  });
+                                },
+                              ),
+                            ),
+                      );
+                } else {
+                  sp.saveDataToFirestore().then(
+                        (value) => sp.saveDataToSharedPreference().then(
+                              (value) => sp.setSignIn().then(
+                                    (value) => {
+                                      googleController.success(),
+                                      Future.delayed(const Duration(seconds: 1),
+                                          () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomePage(),
+                                          ),
+                                        );
+                                      })
+                                    },
+                                  ),
+                            ),
+                      );
+                }
+                setState(() {});
+              },
+            );
+          }
+        },
+      );
+    }
   }
 }
