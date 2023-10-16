@@ -42,10 +42,8 @@ class SignInProvider extends ChangeNotifier {
   }
 
   Future checkSignInUser() async {
-    log("its running");
     final SharedPreferences s = await SharedPreferences.getInstance();
     _isSignedIn = s.getBool("signed_in") ?? false;
-    log("the isSignedIn value ${_isSignedIn}");
     notifyListeners();
   }
 
@@ -141,6 +139,15 @@ class SignInProvider extends ChangeNotifier {
       _hasError = true;
       notifyListeners();
     }
+  }
+
+  void phoneNumberUser(User user) {
+    _name = "Busbus";
+    _email = "<EMAIL>";
+    _uid = user.phoneNumber;
+    _provider = "PHONE";
+    notifyListeners();
+    _imageUrl = "no image my guy";
   }
 
   Future getUserDataFromFirestore(uid) async {

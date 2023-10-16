@@ -27,20 +27,21 @@ class _HomePageState extends State<HomePage> {
     final sp = context.read<SignInProvider>();
     return Scaffold(
       body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                sp.signOut();
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignInPage()));
-              },
-              child: const Text("Sign Out")),
-        ],
-      )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  sp.signOut();
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SignInPage()));
+                },
+                child: const Text("Sign Out")),
+          ],
+        ),
+      ),
     );
   }
 }

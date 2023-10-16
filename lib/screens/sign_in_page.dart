@@ -1,6 +1,7 @@
 import 'package:fire_auths/provider/internet_provider.dart';
 import 'package:fire_auths/provider/sign_in_provider.dart';
 import 'package:fire_auths/screens/home_page.dart';
+import 'package:fire_auths/screens/phone_auth_page.dart';
 import 'package:fire_auths/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -101,7 +102,7 @@ class _SignInPageState extends State<SignInPage> {
                   color: Colors.blue,
                   controller: facebookController,
                   successColor: Colors.blue,
-                  width: MediaQuery.of(context).size.width * 10.80,
+                  width: MediaQuery.of(context).size.width * 0.80,
                   elevation: 0,
                   borderRadius: 25,
                   child: const Wrap(
@@ -119,26 +120,35 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                RoundedLoadingButton(
-                  onPressed: () {},
-                  color: Colors.black,
-                  controller: googleController,
-                  successColor: Colors.black,
-                  width: MediaQuery.of(context).size.width * 10.80,
-                  elevation: 0,
-                  borderRadius: 25,
-                  child: const Wrap(
-                    alignment: WrapAlignment.end,
-                    children: [
-                      Icon(FontAwesomeIcons.phone,
-                          size: 20, color: Colors.white),
-                      SizedBox(width: 15),
-                      Text(
-                        "Sign in with Phone number",
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w500),
-                      ),
-                    ],
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const PhoneAuthPage()));
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.black,
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(FontAwesomeIcons.phone,
+                            size: 20, color: Colors.white),
+                        SizedBox(width: 15),
+                        Text(
+                          "Sign in with Phone number",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
